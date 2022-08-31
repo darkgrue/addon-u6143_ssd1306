@@ -1,10 +1,13 @@
-#!/usr/bin/execlineb -S1
+#!/command/with-contenv bashio
 # ==============================================================================
-# Home Assistant Community Add-on: U6143_ssd1306
+# Take down the S6 supervision tree when service fails
+# s6-overlay docs: https://github.com/just-containers/s6-overlay
 # ==============================================================================
 
 
-if -n { s6-test $# -ne 0 }
-if -n { s6-test ${1} -eq 256 }
+if [[ "${1}" -ne 0 ]] && [[ "${1}" -ne 256 ]]; then
+  bashio::log.warning "Service crashed, halting add-on."
+  /run/s6/basedir/bin/halt
+fi
 
-s6-svscanctl -t /var/run/s6/services
+bashio::log.info "Service stopped, restarting..."
